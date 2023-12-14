@@ -41,7 +41,7 @@ import random
 import string
 
 def get_string(string_length):
-    return ''.join(random.choice(string.ascii_lowercase[0:2]) for _ in range(string_length))
+    return ''.join(random.choice(string.ascii_lowercase[0:26]) for _ in range(string_length))
 
 
 local_rank = None
@@ -746,7 +746,7 @@ class LazySupervisedDataset(Dataset):
                             f.write(response.content)
                     except Exception as e:
                         image_path = os.path.join(image_folder, 'error_image.jpg')
-                        print(f"Error downloading video from {image_file}: {str(e)} \nUsing error_image.jpg")
+                        print(f"Error downloading video from {image_url}: {str(e)} \nUsing error_image.jpg")
                 ####################################################
                 
                 image = Image.open(image_path).convert('RGB')
