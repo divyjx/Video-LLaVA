@@ -729,6 +729,7 @@ class LazySupervisedDataset(Dataset):
                 ########## CODE FOR IMAGE DOWNLOAD ##############
                 # error_image.jpg
                 img_format = '.jpg' 
+                image_url = ''
                 if 'format=png' in image_file:
                     img_format = '.png'
                 image_path = os.path.join(image_folder, image_file)
@@ -738,6 +739,7 @@ class LazySupervisedDataset(Dataset):
                         response = requests.get(image_file)
                         response.raise_for_status()  
                         # image_file = 'image'+img_format
+                        image_url = image_file
                         image_file = get_string(16) + img_format
                         image_path = os.path.join(image_folder, image_file)
                         with open(image_path, 'wb') as f:
@@ -776,6 +778,7 @@ class LazySupervisedDataset(Dataset):
                 ############## CODE FOR VIDEO DOWNLOAD ##############
                 # error_video.mp4
                 video = os.path.join(video_folder, 'error_video.mp4')
+                video_url = ''
                 if video_file.startswith('http'):
                     try:
                         # Download the video
@@ -783,12 +786,13 @@ class LazySupervisedDataset(Dataset):
                         response.raise_for_status()  
 
                         # video_file = 'video.mp4'
+                        video_url = video_file
                         video_file = get_string(15)
                         video = os.path.join(video_folder, video_file)
                         with open(video, 'wb') as f:
                             f.write(response.content)
                     except Exception as e:
-                        print(f"Error downloading video from {video_file}: {str(e)} \nUsing error_video.mp4")
+                        print(f"Error downloading video from {video_url}: {str(e)} \nUsing error_video.mp4")
                 ###########################################################
                 # print(video)
                 video = processor(video, return_tensors='pt')['pixel_values'][0]

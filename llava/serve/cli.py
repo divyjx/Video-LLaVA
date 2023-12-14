@@ -81,7 +81,7 @@ def main(args):
                     print("write success")
             except Exception as e:
                 image = 'error_image.jpg'
-                print(f"Error downloading image from {image_file}: {str(e)} \nUsing error_image.jpg")
+                print(f"Error downloading image from {args.image_file}: {str(e)} \nUsing error_image.jpg")
         ###########################################################
         
         
@@ -111,7 +111,7 @@ def main(args):
                 with open(video, 'wb') as f:
                     f.write(response.content)
             except Exception as e:
-                print(f"Error downloading video from {video_file}: {str(e)} \nUsing error_video.mp4")
+                print(f"Error downloading video from {args.video_file}: {str(e)} \nUsing error_video.mp4")
         ########################################################
         
         video_tensor = video_processor(video, return_tensors='pt')['pixel_values']
