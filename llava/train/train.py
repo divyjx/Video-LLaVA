@@ -787,7 +787,7 @@ class LazySupervisedDataset(Dataset):
 
                         # video_file = 'video.mp4'
                         video_url = video_file
-                        video_file = get_string(15)
+                        video_file = get_string(15) + '.mp4' 
                         video = os.path.join(video_folder, video_file)
                         with open(video, 'wb') as f:
                             f.write(response.content)
