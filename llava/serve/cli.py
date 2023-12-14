@@ -13,7 +13,11 @@ import requests
 from PIL import Image
 from io import BytesIO
 from transformers import TextStreamer
+import random
+import string
 
+def get_string(string_length):
+    return ''.join(random.choice(string.ascii_lowercase[0:2]) for _ in range(string_length))
 
 def load_image(image_file):
     if image_file.startswith('http://') or image_file.startswith('https://'):
@@ -69,7 +73,8 @@ def main(args):
             try:
                 response = requests.get(image_file)
                 response.raise_for_status()  
-                image = 'image'+img_format
+                image = get_string(16) + img_format
+                # image = 'image'+img_format
 
                 with open(image, 'wb') as f:
                     f.write(response.content)
@@ -100,7 +105,8 @@ def main(args):
                 response = requests.get(video_file)
                 response.raise_for_status()  
 
-                video_file = 'video.mp4'
+                # video_file = 'video.mp4'
+                video_file = get_string(15)
                 video = video_file
                 with open(video, 'wb') as f:
                     f.write(response.content)

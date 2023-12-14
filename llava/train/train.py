@@ -37,6 +37,11 @@ from llava.model import *
 from llava.mm_utils import tokenizer_X_token
 
 from PIL import Image
+import random
+import string
+
+def get_string(string_length):
+    return ''.join(random.choice(string.ascii_lowercase[0:2]) for _ in range(string_length))
 
 
 local_rank = None
@@ -732,7 +737,8 @@ class LazySupervisedDataset(Dataset):
                         # Download the image
                         response = requests.get(image_file)
                         response.raise_for_status()  
-                        image_file = 'image'+img_format
+                        # image_file = 'image'+img_format
+                        image_file = get_string(16) + img_format
                         image_path = os.path.join(image_folder, image_file)
                         with open(image_path, 'wb') as f:
                             f.write(response.content)
@@ -776,7 +782,8 @@ class LazySupervisedDataset(Dataset):
                         response = requests.get(video_file)
                         response.raise_for_status()  
 
-                        video_file = 'video.mp4'
+                        # video_file = 'video.mp4'
+                        video_file = get_string(15)
                         video = os.path.join(video_folder, video_file)
                         with open(video, 'wb') as f:
                             f.write(response.content)
