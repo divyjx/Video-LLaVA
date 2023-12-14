@@ -746,7 +746,7 @@ class LazySupervisedDataset(Dataset):
                             f.write(response.content)
                     except Exception as e:
                         image_path = os.path.join(image_folder, 'error_image.jpg')
-                        print(f"Error downloading video from {image_url}: {str(e)} \nUsing error_image.jpg")
+                        print(f"Error downloading image from {image_url}: {str(e)} \nUsing error_image.jpg")
                 ####################################################
                 
                 image = Image.open(image_path).convert('RGB')
