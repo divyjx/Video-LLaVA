@@ -1,6 +1,6 @@
 import argparse
 import torch
-
+import requests
 from llava.constants import X_TOKEN_INDEX, DEFAULT_X_TOKEN, DEFAULT_X_START_TOKEN, DEFAULT_X_END_TOKEN
 from llava.conversation import conv_templates, SeparatorStyle
 from llava.model.builder import load_pretrained_model
@@ -57,6 +57,29 @@ def main(args):
     video = args.video_file
     # print(image, video)
     if args.image_file:
+        
+        
+        ###################### CODE FOR IMAGE DOWNLOAD#########
+        # error_image.jpg
+        image_file = args.image_file
+        if (image_file.startswith('http')):
+            img_format = '.jpg' 
+            if 'format=png' in image_file:
+                img_format = '.png'
+            try:
+                response = requests.get(image_file)
+                response.raise_for_status()  
+                image = 'image'+img_format
+
+                with open(image, 'wb') as f:
+                    f.write(response.content)
+                    print("write success")
+            except Exception as e:
+                image = 'error_image.jpg'
+                print(f"Error downloading image from {image_file}: {str(e)} \nUsing error_image.jpg")
+        ###########################################################
+        
+        
         image_tensor = image_processor.preprocess(image, return_tensors='pt')['pixel_values']
         if type(image_tensor) is list:
             tensor = [image.to(model.device, dtype=torch.float16) for image in image_tensor]
@@ -65,6 +88,26 @@ def main(args):
         key = ['image']
         # print(tensor.shape)
     elif args.video_file:
+        
+        ########### CODE FOR VIDEO DOWNLOAD ##############
+
+        # error_video.mp4
+        video_file = args.video_file
+        video = 'error_video.mp4'
+        if video_file.startswith('http'):
+            try:
+                # Download the video
+                response = requests.get(video_file)
+                response.raise_for_status()  
+
+                video_file = 'video.mp4'
+                video = video_file
+                with open(video, 'wb') as f:
+                    f.write(response.content)
+            except Exception as e:
+                print(f"Error downloading video from {video_file}: {str(e)} \nUsing error_video.mp4")
+        ########################################################
+        
         video_tensor = video_processor(video, return_tensors='pt')['pixel_values']
         if type(video_tensor) is list:
             tensor = [video.to(model.device, dtype=torch.float16) for video in video_tensor]

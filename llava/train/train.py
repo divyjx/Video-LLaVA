@@ -22,6 +22,7 @@ import json
 import logging
 import pathlib
 from typing import Dict, Optional, Sequence, List
+import requests
 
 import torch
 
@@ -719,7 +720,28 @@ class LazySupervisedDataset(Dataset):
                 image_file = self.list_data_dict[i]['image']
                 image_folder = self.data_args.image_folder
                 processor = self.data_args.image_processor
-                image = Image.open(os.path.join(image_folder, image_file)).convert('RGB')
+                
+                ########## CODE FOR IMAGE DOWNLOAD ##############
+                # error_image.jpg
+                img_format = '.jpg' 
+                if 'format=png' in image_file:
+                    img_format = '.png'
+                image_path = os.path.join(image_folder, image_file)
+                if image_file.startswith('http'):
+                    try:
+                        # Download the image
+                        response = requests.get(image_file)
+                        response.raise_for_status()  
+                        image_file = 'image'+img_format
+                        image_path = os.path.join(image_folder, image_file)
+                        with open(image_path, 'wb') as f:
+                            f.write(response.content)
+                    except Exception as e:
+                        image_path = os.path.join(image_folder, 'error_image.jpg')
+                        print(f"Error downloading video from {image_file}: {str(e)} \nUsing error_image.jpg")
+                ####################################################
+                
+                image = Image.open(image_path).convert('RGB')
                 if self.data_args.image_aspect_ratio == 'pad':
                     def expand2square(pil_img, background_color):
                         width, height = pil_img.size
@@ -744,7 +766,23 @@ class LazySupervisedDataset(Dataset):
                 video_file = self.list_data_dict[i]['video']
                 video_folder = self.data_args.video_folder
                 processor = self.data_args.video_processor
-                video = os.path.join(video_folder, video_file)
+                
+                ############## CODE FOR VIDEO DOWNLOAD ##############
+                # error_video.mp4
+                video = os.path.join(video_folder, 'error_video.mp4')
+                if video_file.startswith('http'):
+                    try:
+                        # Download the video
+                        response = requests.get(video_file)
+                        response.raise_for_status()  
+
+                        video_file = 'video.mp4'
+                        video = os.path.join(video_folder, video_file)
+                        with open(video, 'wb') as f:
+                            f.write(response.content)
+                    except Exception as e:
+                        print(f"Error downloading video from {video_file}: {str(e)} \nUsing error_video.mp4")
+                ###########################################################
                 # print(video)
                 video = processor(video, return_tensors='pt')['pixel_values'][0]
                 # print(video, 'success')
