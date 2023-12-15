@@ -6,7 +6,6 @@ from pycocotools.coco import COCO
 from pycocoevalcap.eval import COCOEvalCap
 
 def main(args):
-  eval_file_path = args.eval_file_path
   prediction_file_path = args.prediction_file_path
   input_file_path = args.input_file_path
   type_of_data = args.type_of_data
@@ -144,7 +143,6 @@ def transform_format_results(input_file, output_file):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--prediction-file-path", type=str, default = "'output.json'")
-    parser.add_argument("--eval-file-path", type=str, default = "'eval.json'")   #Where should output file be
     parser.add_argument("--input-file-path", type=str, default = "'behaviour_100.json'")
     parser.add_argument("--type-of-data", type=str, default = "'behaviour'")     #Specify if evalution is to be done for "behaviour" or "content" simulation
     args = parser.parse_args()
