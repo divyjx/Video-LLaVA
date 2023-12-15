@@ -1,13 +1,14 @@
-
-
 DATA_ROOT="data_root"
+DATA_ROOT_IMAGE="images"
+DATA_ROOT_VIDEO="videos"
+
 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=0 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 deepspeed llava/train/train_mem.py \
     --deepspeed ./scripts/zero2.json \
     --model_name_or_path lmsys/vicuna-7b-v1.5 \
     --version v1 \
-    --data_path train_json/videochatgpt_llavaimage_tune.json \
-    --video_folder ${DATA_ROOT} \
-    --image_folder ${DATA_ROOT} \
+    --data_path tuning_data/merged_200k.json \
+    --video_folder ${DATA_ROOT_VIDEO} \
+    --image_folder ${DATA_ROOT_IMAGE} \
     --X "Video" "Image" \
     --video_tower LanguageBind/LanguageBind_Video_merge \
     --image_tower LanguageBind/LanguageBind_Image \
@@ -36,7 +37,7 @@ HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=0 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,
     --tf32 True \
     --model_max_length 2048 \
     --gradient_checkpointing True \
-    --dataloader_num_workers 8 \
+    --dataloader_num_workers 16 \
     --lazy_preprocess True \
     --report_to tensorboard \
     --cache_dir "./cache_dir"
