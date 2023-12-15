@@ -73,6 +73,7 @@ Follow these steps to obtain answers for the questions:
 ## Notebooks
 
 Alternatively you can try running VideoLLaVA-inference.ipynb for inference and evaluation.
+Remember to connect to GPU when running inference or evaluation.
 
 
 ## 🛠️ Requirements and Installation
