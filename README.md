@@ -1,6 +1,6 @@
 
 <div align= "center">
-    <h1> 🔥 VideoLLaVA</h1>
+    <h1> 🔥 Finetuned VideoLLaVA</h1>
 </div>
 
 ## Overview
@@ -70,7 +70,7 @@ Follow these steps to obtain answers for the questions:
   ```
   Here your_type should be either behaviour or content
 
-* **Notebooks**
+## Notebooks
 
 Alternatively you can try running VideoLLaVA-inference.ipynb for inference and evaluation.
 
