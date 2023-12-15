@@ -36,7 +36,7 @@ def main(args):
             roles = conv.roles
             ###################IMAGE######################
             if typee == 'image':
-              image_path = entry['video']
+              image_path = entry['image']
               image, error = image_download(image_folder, image_path)
               image_processor = processor['image']
 
