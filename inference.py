@@ -26,6 +26,10 @@ def main(args):
     image_folder = args.image_folder
     video_folder = args.video_folder
     tokenizer, model, processor, context_len = load_pretrained_model(model_path, None, model_name, load_8bit, load_4bit, device=device)
+    empty_list = []
+    with open(output_file_path, 'w') as json_file:
+      json.dump(empty_list, json_file, indent=2)
+    full_data = []
 ################## LOOP FOR BATCH INFERENCE ############
     for entry in instruct_data:
         if 'id' in entry and (('video' in entry) or ('image' in entry)) and 'conversations' in entry:
@@ -74,9 +78,10 @@ def main(args):
                 'type': f'{typee}',
                 'output': f'{outputs}'
               }
-              with open(output_file_path, 'a+') as json_file:
-                json_file.seek(0)
-                json.dump(new_data, json_file, indent=2)
+              full_data.append(new_data)
+              #with open(output_file_path, 'a+') as json_file:
+               # json_file.seek(0)
+               # json.dump(new_data, json_file, indent=2)
 
             #####################VIDEO#########################
             elif typee == 'video':
@@ -117,9 +122,14 @@ def main(args):
                 'type': f'{typee}',
                 'output': f'{outputs}'
               }
-              with open(output_file_path, 'a+') as json_file:
-                json_file.seek(0)
-                json.dump(new_data, json_file, indent=2)
+              full_data.append(new_data)
+              #with open(output_file_path, 'a+') as json_file:
+               # json_file.seek(0)
+                #json.dump(new_data, json_file, indent=2)
+    with open(output_file_path, 'w') as json_file:
+      json.dump(full_data, json_file, 
+                        indent=4,  
+                        separators=(',',': '))
 
 def image_download(image_folder, image_file):
   error = False
