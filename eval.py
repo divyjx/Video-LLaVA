@@ -2,6 +2,7 @@ import os
 import json
 import argparse
 import re
+import math
 from pycocotools.coco import COCO
 from pycocoevalcap.eval import COCOEvalCap
 
@@ -30,7 +31,7 @@ def main(args):
 
   if type_of_data == 'behaviour':
     loss = behaviour_loss(merged_data)
-    print(loss)
+    print(f'RMSE Loss for {input_file_path} is : {loss}')
   elif type_of_data == 'content':
     transform_format_annotation(input_file_path, "annotations_for_content_loss.json")
     transform_format_results(prediction_file_path, "results_for_content_loss.json")
@@ -48,13 +49,12 @@ def main(args):
 
 
 def behaviour_loss(merged_data):
-    i = 0
+    loss = []
     for entry in merged_data:
       id = entry['id']
       likes = entry['prediction']
       error = entry['error']
       true_likes = entry['true_output']
-      loss = []
       ##########DONT CALCULATE LOSS IN CASE OF ERROR DOWNLOAD#############
       if error == 'True':
         continue
@@ -63,20 +63,19 @@ def behaviour_loss(merged_data):
         ##############CALULATE RMSE LOSS##################
         likes_int = int(extract_likes(likes))
         true_likes_int = int(extract_likes(true_likes))
-        loss[i] = rmse_loss(likes_int, true_likes_int)
-        i = i + 1
-    return sum(loss)/len(loss)
+        loss.append(rmse_loss(likes_int, true_likes_int))
+    return math.sqrt(sum(loss)/len(loss))
 
 
 ##########FUNCTION FOR RMSE LOSS################
 
 def rmse_loss(predicted, true):
-    return math.sqrt(math.mean((predicted - true)) ** 2)
+    return (predicted - true) ** 2
 
 
 ###########CODE TO CHECK IF LIKES STRING CONTAIN ONLY INTERGERS AND TO EXTRACT THOSE INTEGERS##############
 def check_if_likes(input_string):
-    pattern = r'^\d+<s>$'
+    pattern = r'^\d+</s>$'
     match = re.search(pattern, input_string)
     return bool(match)
 
@@ -126,12 +125,11 @@ def transform_format_results(input_file, output_file):
     annotations = []
 
     for item in data:
-      if item.get("error", "").lower() != "true":
-          annotation = {
-              "image_id": int(item["id"]),
-              "caption": item["output"]
-          }
-          annotations.append(annotation)
+        annotation = {
+            "image_id": int(item["id"]),
+            "caption": item["output"]
+        }
+        annotations.append(annotation)
 
     with open(output_file, 'w') as f:
         json.dump(annotations, f, indent=2)
