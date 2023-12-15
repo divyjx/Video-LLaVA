@@ -28,7 +28,7 @@ def main(args):
     tokenizer, model, processor, context_len = load_pretrained_model(model_path, None, model_name, load_8bit, load_4bit, device=device)
 ################## LOOP FOR BATCH INFERENCE ############
     for entry in instruct_data:
-        if 'id' in entry and'video' in entry and 'conversations' in entry:
+        if 'id' in entry and (('video' in entry) or ('image' in entry)) and 'conversations' in entry:
             typee = entry["conversations"][0]["value"][1:6]
             prompt = entry["conversations"][0]["value"]
             id = entry['id']
@@ -37,7 +37,7 @@ def main(args):
             ###################IMAGE######################
             if typee == 'image':
               image_path = entry['video']
-              image = image_download(image_folder, image_path)
+              image, error = image_download(image_folder, image_path)
               image_processor = processor['image']
 
               image_tensor = image_processor.preprocess(image, return_tensors='pt')['pixel_values']
@@ -70,6 +70,7 @@ def main(args):
               #############ADD OUTPUTS TO A JSON FILE###############
               new_data = {
                 'id': f'{id}',
+                'error': f'{error}',              #Check if we used error image or video
                 'type': f'{typee}',
                 'output': f'{outputs}'
               }
@@ -80,7 +81,7 @@ def main(args):
             #####################VIDEO#########################
             elif typee == 'video':
               video_path = entry['video']
-              video = video_download(video_folder, video_path)
+              video, error = video_download(video_folder, video_path)
               video_processor = processor['video']
               video_tensor = video_processor(video, return_tensors='pt')['pixel_values']
               if type(video_tensor) is list:
@@ -112,6 +113,7 @@ def main(args):
               #############ADD OUTPUTS TO A JSON FILE###############
               new_data = {
                 'id': f'{id}',
+                'error': f'{error}',
                 'type': f'{typee}',
                 'output': f'{outputs}'
               }
@@ -120,6 +122,7 @@ def main(args):
                 json.dump(new_data, json_file, indent=2)
 
 def image_download(image_folder, image_file):
+  error = False
   if (image_file.startswith('http')):
       img_format = '.jpg'
       if 'format=png' in image_file:
@@ -133,11 +136,13 @@ def image_download(image_folder, image_file):
               f.write(response.content)
       except Exception as e:
           image = os.path.join(image_folder, 'error_image.jpg')
+          error = True
           print(f"Error downloading image from {image_file}: {str(e)} \nUsing error_image.jpg")
-  return image
+  return image, error
 
 
 def video_download(video_folder, video_file):
+  error = False
   if video_file.startswith('http'):
       try:
           # Download the video
@@ -150,8 +155,9 @@ def video_download(video_folder, video_file):
               f.write(response.content)
       except Exception as e:
           video = os.path.join(video_folder, 'error_video.mp4')
+          error = True
           print(f"Error downloading video from {video_file}: {str(e)} \nUsing error_video.mp4")
-  return video
+  return video, error
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
