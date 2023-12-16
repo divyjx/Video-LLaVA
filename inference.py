@@ -130,10 +130,11 @@ def main(args):
               #with open(output_file_path, 'a+') as json_file:
                # json_file.seek(0)
                 #json.dump(new_data, json_file, indent=2)
-    with open(output_file_path, 'w') as json_file:
-      json.dump(full_data, json_file, 
-                        indent=4,  
-                        separators=(',',': '))
+            if no_examples_done % 100 == 0:
+                with open(output_file_path, 'w') as json_file:
+                  json.dump(full_data, json_file, 
+                                    indent=4,  
+                                    separators=(',',': '))
 
 def image_download(image_folder, image_file):
   error = False
