@@ -7,6 +7,7 @@ from pycocotools.coco import COCO
 from pycocoevalcap.eval import COCOEvalCap
 
 def main(args):
+###################### OPENING ALL JSON FILES ##########################
   prediction_file_path = args.prediction_file_path
   input_file_path = args.input_file_path
   type_of_data = args.type_of_data
@@ -16,22 +17,24 @@ def main(args):
   with open(prediction_file_path, 'r') as file:
     prediction_file = json.load(file)
 
-# Merge data based on the 'id' key
-  merged_data = []
-  for item1 in input_file:
-      for item2 in prediction_file:
-          if item1['id'] == item2['id']:
-              merged_item = {
-                  'id': item1['id'],
-                  'error': item2['error'],
-                  'prediction': item2['output'],
-                  'true_output': item1["conversations"][1]["value"]
-              }
-              merged_data.append(merged_item)
-
+####################### LOSS IN CASE OF BEHAVIOUR SIMULATION ########################
   if type_of_data == 'behaviour':
+    #Merged data for calculation behaviour loss
+    merged_data = []
+    for item1 in input_file:
+        for item2 in prediction_file:
+            if item1['id'] == item2['id']:
+                merged_item = {
+                    'id': item1['id'],
+                    'error': item2['error'],
+                    'prediction': item2['output'],
+                    'true_output': item1["conversations"][1]["value"]
+                }
+                merged_data.append(merged_item)
     loss = behaviour_loss(merged_data)
     print(f'RMSE Loss for {input_file_path} is : {loss}')
+
+  ###################### LOSS IN CASE OF CONTENT SIMULATION ##########################
   elif type_of_data == 'content':
     transform_format_annotation(input_file_path, "annotations_for_content_loss.json")
     transform_format_results(prediction_file_path, "results_for_content_loss.json")
@@ -48,6 +51,9 @@ def main(args):
 
 
 
+
+
+################## FUNCTIONS TO CALCULATE BEHAVIOUR LOSS ##################
 def behaviour_loss(merged_data):
     loss = []
     for entry in merged_data:
@@ -55,25 +61,21 @@ def behaviour_loss(merged_data):
       likes = entry['prediction']
       error = entry['error']
       true_likes = entry['true_output']
-      ##########DONT CALCULATE LOSS IN CASE OF ERROR DOWNLOAD#############
-      if error == 'True':
+      if error == 'True':                                       # Don't calculate loss when error true
         continue
-      ##########OUTPUT SHOULD ONLY HAVE LIKES############
-      if check_if_likes(likes):
-        ##############CALULATE RMSE LOSS##################
+      if check_if_likes(likes):                                 # Check if output of LLM contains only likes 
         likes_int = int(extract_likes(likes))
         true_likes_int = int(extract_likes(true_likes))
-        loss.append(rmse_loss(likes_int, true_likes_int))
+        loss.append(rmse_loss(likes_int, true_likes_int))       # Add RMSE Loss
     return math.sqrt(sum(loss)/len(loss))
 
-
-##########FUNCTION FOR RMSE LOSS################
 
 def rmse_loss(predicted, true):
     return (predicted - true) ** 2
 
 
-###########CODE TO CHECK IF LIKES STRING CONTAIN ONLY INTERGERS AND TO EXTRACT THOSE INTEGERS##############
+
+################## CODE TO CHECK IF LIKES STRING CONTAIN ONLY INTERGERS AND TO EXTRACT THOSE INTEGERS #####################
 def check_if_likes(input_string):
     pattern = r'^\d+</s>$'
     match = re.search(pattern, input_string)
@@ -85,9 +87,21 @@ def extract_likes(input_string):
   return result
 
 
-###TRANSFORM FUNCTION OF COCO EVALUATION#############
 
-def transform_format_annotation(input_file, output_file):
+
+
+
+
+
+
+
+
+
+
+
+################### TRANSFORM FUNCTIONS OF COCO EVALUATION #########################
+
+def transform_format_annotation(input_file, output_file):                     # Make annotation file(input file) match the format required for coco evaluation
     with open(input_file, 'r') as f:
         data = json.load(f)
 
@@ -116,9 +130,8 @@ def transform_format_annotation(input_file, output_file):
         json.dump(transformed_data, f, indent=2)
     return 0
 
-###TRANSFORM FUNCTION OF COCO EVALUATION#############
 
-def transform_format_results(input_file, output_file):
+def transform_format_results(input_file, output_file):                      # Make results file(prediction file) match the format required for coco evaluation
     with open(input_file, 'r') as f:
         data = json.load(f)
 
@@ -138,10 +151,16 @@ def transform_format_results(input_file, output_file):
 
 
 
+
+
+
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--prediction-file-path", type=str, default = "'output.json'")
-    parser.add_argument("--input-file-path", type=str, default = "'behaviour_100.json'")
-    parser.add_argument("--type-of-data", type=str, default = "'behaviour'")     #Specify if evalution is to be done for "behaviour" or "content" simulation
+    parser.add_argument("--prediction-file-path", type=str, default = "'output.json'")      # Prediction File Path
+    parser.add_argument("--input-file-path", type=str, default = "'behaviour_100.json'")    # Input File Path
+    parser.add_argument("--type-of-data", type=str, default = "'behaviour'")                # Specify if evalution is to be done for "behaviour" or "content" simulation
     args = parser.parse_args()
     main(args)
