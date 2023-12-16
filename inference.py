@@ -12,7 +12,7 @@ from pycocotools.coco import COCO
 from pycocoevalcap.eval import COCOEvalCap
 
 def main(args):
-############### LOAD MODEL #################
+######################## LOAD MODEL AND FILES ######################
     disable_torch_init()
     model_path = args.model_path
     instruct_path = args.instruct_path
@@ -31,7 +31,7 @@ def main(args):
       json.dump(empty_list, json_file, indent=2)
     full_data = []
     no_examples_done = 0
-################## LOOP FOR BATCH INFERENCE ############
+############################ LOOP FOR BATCH INFERENCE #############################
     for entry in instruct_data:
         if 'id' in entry and (('video' in entry) or ('image' in entry)) and 'conversations' in entry:
             no_examples_done = no_examples_done + 1
@@ -42,7 +42,7 @@ def main(args):
             id = entry['id']
             conv = conv_templates[conv_mode].copy()
             roles = conv.roles
-            ###################IMAGE######################
+            ##################### INFERENCE IF MEDIA TYPE IS IMAGE #########################
             if typee == 'image':
               image_path = entry['image']
               image, error = image_download(image_folder, image_path)
@@ -75,7 +75,7 @@ def main(args):
                       stopping_criteria=[stopping_criteria])
 
               outputs = tokenizer.decode(output_ids[0, input_ids.shape[1]:]).strip()
-              #############ADD OUTPUTS TO A JSON FILE###############
+                
               new_data = {
                 'id': f'{id}',
                 'error': f'{error}',              #Check if we used error image or video
@@ -83,11 +83,8 @@ def main(args):
                 'output': f'{outputs}'
               }
               full_data.append(new_data)
-              #with open(output_file_path, 'a+') as json_file:
-               # json_file.seek(0)
-               # json.dump(new_data, json_file, indent=2)
 
-            #####################VIDEO#########################
+            ##################### INFERENCE IF MEDIA TYPE IS VIDEO #########################
             elif typee == 'video':
               video_path = entry['video']
               video, error = video_download(video_folder, video_path)
@@ -119,7 +116,7 @@ def main(args):
                       stopping_criteria=[stopping_criteria])
 
               outputs = tokenizer.decode(output_ids[0, input_ids.shape[1]:]).strip()
-              #############ADD OUTPUTS TO A JSON FILE###############
+                
               new_data = {
                 'id': f'{id}',
                 'error': f'{error}',
@@ -127,15 +124,21 @@ def main(args):
                 'output': f'{outputs}'
               }
               full_data.append(new_data)
-              #with open(output_file_path, 'a+') as json_file:
-               # json_file.seek(0)
-                #json.dump(new_data, json_file, indent=2)
+
+            ######################### OUTPUT ADDED TO A JSON FILE EVERY 100 STEPS #####################
             if no_examples_done % 100 == 0:
                 with open(output_file_path, 'w') as json_file:
                   json.dump(full_data, json_file, 
                                     indent=4,  
                                     separators=(',',': '))
 
+
+
+
+
+
+
+########################### FUNCTIONS TO DOWNLOAD MEDIA ############################
 def image_download(image_folder, image_file):
   error = False
   if (image_file.startswith('http')):
@@ -173,6 +176,14 @@ def video_download(video_folder, video_file):
           error = True
           print(f"Error downloading video from {video_file}: {str(e)} \nUsing error_video.mp4")
   return video, error
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
