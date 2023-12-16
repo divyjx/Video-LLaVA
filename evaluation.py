@@ -17,7 +17,7 @@ def main(args):
   with open(prediction_file_path, 'r') as file:
     prediction_file = json.load(file)
 
-####################### LOSS IN CASE OF BEHAVIOUR SIMULATION ########################
+####################### LOSS IN CASE OF BEHAVIOUR SIMULATION #######################
   if type_of_data == 'behaviour':
     #Merged data for calculation behaviour loss
     merged_data = []
