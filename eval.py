@@ -106,7 +106,6 @@ def extract_likes(input_string):
 
 
 ################### TRANSFORM FUNCTIONS OF COCO EVALUATION #########################
-
 def transform_format_annotation(input_file, output_file):                     # Make annotation file(input file) match the format required for coco evaluation
     with open(input_file, 'r') as f:
         data = json.load(f)
