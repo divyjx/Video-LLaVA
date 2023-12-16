@@ -65,7 +65,6 @@ Follow these steps to obtain answers for the questions:
     %%shell
     eval "$(conda shell.bash hook)"
     conda activate videollava
-    #######################################################
     python eval.py --prediction-file-path "your_model_output.json" --input-file-path "tuning_data/your_data.json" --type-of-data "your_type"
   ```
   Here your_type should be either behaviour or content
