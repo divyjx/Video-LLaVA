@@ -30,9 +30,13 @@ def main(args):
     with open(output_file_path, 'w') as json_file:
       json.dump(empty_list, json_file, indent=2)
     full_data = []
+    no_examples_done = 0
 ################## LOOP FOR BATCH INFERENCE ############
     for entry in instruct_data:
         if 'id' in entry and (('video' in entry) or ('image' in entry)) and 'conversations' in entry:
+            no_examples_done = no_examples_done + 1
+            if no_examples_done % 100 == 0 :
+                print(no_examples_done)
             typee = entry["conversations"][0]["value"][1:6]
             prompt = entry["conversations"][0]["value"]
             id = entry['id']
