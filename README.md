@@ -47,6 +47,17 @@ Follow these steps to obtain answers for the questions:
 6. With that you have all the neccessary files to run inference and evaluation
 
 
+## How to prepare dataset ?
+Refer to preprocess_1.ipynb and preprocess_2.ipynb for preparing data. 
+
+## How to do fine-tuning ?
+Refer to VideoLlaVa_train.ipynb for fine-tuning or run the following command after setting up enviornment and preprocessing data. Remember to edit the finetune_final.sh script according to device specifications.
+```python
+%%shell
+eval "$(conda shell.bash hook)"
+conda activate videollava
+bash scripts/v1_5/finetune_final.sh
+```
 ## How to do inference ?
 
 - With current directory set as Video-LLaVA run the following command :
