@@ -5,8 +5,7 @@
 
 ## Overview
 
-The model we used for this project is Video-LLaVA. It is a multimodal LLM with capabilites of interpreting images and videos. To do behaviour and content simulation we finetuned this model over dataset given here : https://huggingface.co/datasets/divyjx/VideoLLaVA_dataset . This enabled the model to take text and media content of a tweet and make predictions on number of likes (behaviour simulation) or take amount of likes and media content and given text content to get those amount of likes (content simuation). To check that finetuing does provide a better result we compare it with results from a model finetuned on just 10k datapoints here : https://huggingface.co/divyjx/VideoLLaVA10k
-
+The model we used for this project is Video-LLaVA. It is a multimodal LLM with capabilites of interpreting images and videos. To do behaviour and content simulation we finetuned this model over dataset given here : https://huggingface.co/datasets/divyjx/VideoLLaVA_dataset . This enabled the model to take text and media content of a tweet and make predictions on number of likes (behaviour simulation) or take amount of likes and media content and given text content to get those amount of likes (content simuation). To check that finetuing does provide a better result we compare it with results from a model finetuned on just 10k datapoints here : https://huggingface.co/divyjx/VideoLLaVA10k. The final model can be a
 ## Usage
 
 Follow these steps to obtain answers for the questions:
